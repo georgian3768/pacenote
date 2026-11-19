@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <!-- Android 13 redacts WifiInfo.getSSID() without this; the app matches the
+         ESP32 AP by SSID in WifiController.registerEspNetwork(). -->
+    <uses-permission android:name="android.permission.NEARBY_WIFI_DEVICES"
+        android:usesPermissionFlags="neverForLocation" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+
+    <!-- Android 11+ package visibility: without these, getLaunchIntentForPackage()
+         returns null for the music/maps targets and the shortcut silently falls
+         back to a browser URL (measured 2026-10-31: ReVanced YT Music was
+         installed but "no launcher activity found"). -->
+    <queries>
+        <package android:name="app.revanced.android.apps.youtube.music" />
+        <package android:name="com.google.android.apps.youtube.music" />
+        <package android:name="com.spotify.music" />
+        <package android:name="com.google.android.apps.maps" />
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+    </queries>
+
+    <application
+        android:name=".PocketMechanicApp"
+        android:allowBackup="false"
+        android:label="Pacenote"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:theme="@style/AppTheme">
+
+        <!-- S3A shell: splash routes to onboarding (first run) or dashboard. -->
+        <activity
+            android:name=".SplashActivity"
+            android:exported="true"
+            android:theme="@style/AppTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".OnboardingActivity"
+            android:exported="false"
+            android:theme="@style/AppTheme" />
+
+        <!-- The landing is portrait-only for now. Landscape stays a feature of the
+             floating overlay, where the panel is a cockpit column over another
+             app; merging the menu and the panel side by side is a later change.
+             Locking here also means the Compose view is never rebuilt for an
+             orientation the layout has not been designed for. -->
+        <activity
+            android:name=".DashboardActivity"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
+
+        <activity
+            android:name=".CalibrationActivity"
+            android:exported="false"
+            android:theme="@style/AppTheme" />
+
+        <activity
+            android:name=".TripsActivity"
+            android:exported="false"
+            android:theme="@style/AppTheme" />
+
+        <!-- Customer-facing entry point to trips, calibration and settings. It
+             replaces the dashboard "dev" button, which is hidden in the customer
+             view, so the dev screen stays reachable without being advertised. -->
+        <activity
+            android:name=".MenuActivity"
+            android:exported="false"
+            android:theme="@style/AppTheme" />
+
+        <!-- Spike/dev screen: reachable from the menu's Diagnostics row and via
+             adb shell am start; keeps the S2 test buttons alive. -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:theme="@style/AppTheme" />
+
+        <!-- connectedDevice: this service owns a link to the car's access point. -->
+        <!-- Trip CSV share: content:// instead of file:// (API 24+). -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.files"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
+        <service
+            android:name=".SpikeService"
+            android:exported="false"
+            android:foregroundServiceType="connectedDevice" />
+
+        <!-- Navigation notification listener: the only supported way to know a
+             turn-by-turn session is running (Maps/Waze post CATEGORY_NAVIGATION).
+             BOUND by the system once the user grants notification access; the
+             service itself decides the HUD. -->
+        <service
+            android:name=".NavListenerService"
+            android:exported="false"
+            android:label="Pacenote navigation HUD"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
+
+        <receiver
+            android:name=".SuggestionReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.net.wifi.action.WIFI_NETWORK_SUGGESTION_POST_CONNECTION" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".BootReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+    </application>
+</manifest>

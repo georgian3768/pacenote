@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Light half of the day/night pair.
+         Theme.DeviceDefault.DayNight has no NoActionBar variant in android-33,
+         so the pair is expressed with resource qualifiers instead: this file is
+         the light one, values-night/themes.xml is the dark one. Both item lists
+         must stay in step; they differ only in parent and the bar appearance. -->
+    <style name="AppTheme" parent="@android:style/Theme.DeviceDefault.Light.NoActionBar">
+        <item name="android:windowBackground">@color/pm_page</item>
+        <item name="android:statusBarColor">@color/pm_page</item>
+        <item name="android:navigationBarColor">@color/pm_page</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
+        <item name="android:colorAccent">@color/pm_accent</item>
+    </style>
+</resources>

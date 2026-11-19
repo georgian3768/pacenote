@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- Trip CSV exports. Cache dir, so nothing user-visible leaks between runs. -->
+    <cache-path name="exports" path="exports/" />
+</paths>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The ESP32 AP is a local, unauthenticated HTTP endpoint on 192.168.4.1.
+     Cleartext is allowed for that address only; everything else keeps the
+     Android 9+ default (cleartext blocked). -->
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">192.168.4.1</domain>
+    </domain-config>
+</network-security-config>

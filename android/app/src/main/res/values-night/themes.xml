@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dark half of the day/night pair; see values/themes.xml for why this is
+         two files rather than Theme.DeviceDefault.DayNight. -->
+    <style name="AppTheme" parent="@android:style/Theme.DeviceDefault.NoActionBar">
+        <item name="android:windowBackground">@color/pm_page</item>
+        <item name="android:statusBarColor">@color/pm_page</item>
+        <item name="android:navigationBarColor">@color/pm_page</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:colorAccent">@color/pm_accent</item>
+    </style>
+</resources>

@@ -1,0 +1,29 @@
+# Build output
+android/.gradle/
+android/build/
+android/**/build/
+firmware/.pio/
+*.apk
+*.bin
+*.elf
+*.map
+
+# Local machine config and secrets — never commit
+android/local.properties
+android/keystore.properties
+*.jks
+*.keystore
+*.p12
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.pyc

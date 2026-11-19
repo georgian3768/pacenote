@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Only the window background lives in resources: every other colour is a
+         semantic token in Theme.kt. This one has to exist before the first
+         frame, and a resource qualifier is the cheapest way to avoid a dark
+         flash on a light phone. -->
+    <color name="pm_page">#F2F4F7</color>
+    <color name="pm_accent">#0E7A4A</color>
+</resources>

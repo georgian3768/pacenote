@@ -1,0 +1,87 @@
+VERSION "2026-11-10"
+
+NS_ :
+    NS_DESC_
+    CM_
+    BA_DEF_
+    BA_
+    VAL_
+    CAT_DEF_
+    CAT_
+    FILTER
+    BA_DEF_DEF_
+    EV_DATA_
+    ENVVAR_DATA_
+    SGTYPE_
+    SGTYPE_VAL_
+    BA_DEF_SGTYPE_
+    BA_SGTYPE_
+    SIG_TYPE_REF_
+    VAL_TABLE_
+    SIG_GROUP_
+    SIG_VALTYPE_
+    SIGTYPE_VALTYPE_
+    BO_TX_BU_
+    BA_DEF_REL_
+    BA_REL_
+    BA_DEF_DEF_REL_
+    BU_SG_REL_
+    BU_EV_REL_
+    BU_BO_REL_
+    SG_MUL_VAL_
+
+BS_:
+
+BU_: ECM ABS
+
+CM_ "Maruti Suzuki Celerio 2016 (K10B, 998 cc), 500 kbit/s. Reverse engineered from a parked capture and two driving sessions; can/notes.md has the evidence. Two runtime factors are deliberately NOT in this file: 0x314 wheel speed is multiplied by the device's spdscale (default 2.2) to get km/h, and that factor is still GPS-unverified, so the signal stays raw; 0x124 CoolantRaw is raw counts, not degrees C.";
+
+BO_ 292 ECM_1: 8 ECM
+ SG_ EngineSpeed : 15|16@0+ (0.25,0) [0|16383.75] "rpm" Vector__XXX
+ SG_ CoolantRaw : 31|16@0+ (1,0) [0|65535] "" Vector__XXX
+
+BO_ 288 ECM_2: 8 ECM
+ SG_ Status1 : 7|8@0+ (1,0) [0|255] "" Vector__XXX
+ SG_ Thr1 : 23|8@0+ (1,0) [0|255] "" Vector__XXX
+ SG_ Status4 : 31|8@0+ (1,0) [0|255] "" Vector__XXX
+ SG_ Thr2 : 39|8@0+ (1,0) [0|255] "" Vector__XXX
+ SG_ Counter6 : 47|8@0+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 319 ECM_3: 8 ECM
+ SG_ EngineSpeedAlt : 0|16@1+ (0.25,0) [0|16383.75] "rpm" Vector__XXX
+
+BO_ 788 ABS_1: 8 ABS
+ SG_ WheelSpeedRaw : 15|16@0+ (0.00390625,0) [0|255.99] "" Vector__XXX
+ SG_ DistRaw : 31|16@0+ (1,0) [0|8191] "" Vector__XXX
+
+BO_ 792 ABS_2: 8 ABS
+ SG_ EngRunningBit : 0|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ BrakePressed : 2|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ Status2 : 8|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 952 KEEPALIVE: 8 Vector__XXX
+ SG_ KeepAliveD1 : 7|8@0+ (1,0) [0|255] "" Vector__XXX
+
+CM_ BO_ 292 "ECM_1. Engine speed at 10 ms.";
+CM_ SG_ 292 EngineSpeed "Confirmed. Bytes 2-3 (1-indexed), 16-bit big-endian, x0.25 rpm/LSB. Mirrored by 0x13F (correlation 0.998).";
+CM_ SG_ 292 CoolantRaw "Unverified. Bytes 4-5 big-endian. Falls as the engine warms (4623 cold, 4021-4112 running) and saturates warm, so it looks like an inverted NTC coolant sensor; it is not degrees C and it pins at 4000 on the bench.";
+CM_ BO_ 288 "ECM_2. Throttle and engine-state bytes at 10 ms.";
+CM_ SG_ 288 Status1 "Unverified. Byte 1; bit 0 clears 9-10 s after crank onset.";
+CM_ SG_ 288 Thr1 "Unverified channel. Byte 3, 0-255, idle ~31-37, full press 218-239. Not pedal-linear; which of Thr1/Thr2 is the pedal sensor is still open.";
+CM_ SG_ 288 Status4 "Unverified. Byte 4; 0x13 becomes 0x03 when the engine is confirmed running.";
+CM_ SG_ 288 Thr2 "Unverified channel. Byte 5. Tracks Thr1 at steady state, diverges on transients.";
+CM_ SG_ 288 Counter6 "Rolling counter, 0-3.";
+CM_ BO_ 319 "ECM_3. Second copy of engine speed at 20 ms.";
+CM_ SG_ 319 EngineSpeedAlt "Confirmed. Bytes 1-2, 16-bit little-endian, x0.25 rpm/LSB.";
+CM_ BO_ 788 "ABS_1. Wheel speed and a distance counter at 20 ms.";
+CM_ SG_ 788 WheelSpeedRaw "Probable. Bytes 2-3 big-endian, /256, then multiplied by the device's spdscale (default 2.2) to get km/h. Fitted to narrated speedometer readings (~4 km/h RMSE); the GPS wizard exists to confirm it.";
+CM_ SG_ 788 DistRaw "Probable. Bytes 4-5 big-endian raw counts, wraps at 8192 (~8100 counts/km) and restarts on every key cycle, so it under-counts trips with a reset in them. Cross-check only, never a distance source.";
+CM_ BO_ 792 "ABS_2. Brake switch and engine state at 100 ms.";
+CM_ SG_ 792 BrakePressed "Probable. Bit 2 of byte 1; set while the pedal is pressed. Every observed on-interval had falling speed.";
+CM_ SG_ 792 EngRunningBit "Probable. Bit 0 of byte 1, engine-running flag (0x01 with 0x04 while braking and running).";
+CM_ SG_ 792 Status2 "Unverified. Byte 2; 0x46 with the engine off, 0x06 at crank onset.";
+CM_ BO_ 952 "Keepalive. The only ID still transmitted after key-out (100 ms); the rest of the bus sleeps. Payload not decoded, which is why the message is intentionally empty.";
+CM_ SG_ 952 KeepAliveD1 "Unverified. Constant payload, kept so the message parses in tools that require a signal.";
+
+VAL_ 792 BrakePressed 0 "released" 1 "pressed" ;
+VAL_ 792 EngRunningBit 0 "off" 1 "running" ;
