@@ -15,6 +15,12 @@ Built and verified against a **2016 Maruti Suzuki Celerio (K10B, 5-speed
 manual, 500 kbps CAN)**. The app is car-agnostic; the signal decode is not —
 other cars need their own DBC (see [Signal decode](#signal-decode)).
 
+<p align="center">
+  <img src="screenshots/home.png" width="240" alt="Home screen with live telemetry" />
+  <img src="screenshots/trips.png" width="240" alt="Trip history" />
+  <img src="screenshots/calibration.png" width="240" alt="Guided sensor calibration" />
+</p>
+
 ---
 
 ## What it does
